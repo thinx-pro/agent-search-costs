@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Search Costs</title>
+<meta name="description" content="What will web search and page fetching cost your AI agent per month? DeepSeek, Brave, Exa, Tavily, Serper, SerpApi, Perplexity, Firecrawl — prices checked against each provider's own page.">
+<style>
+  :root {
+    --bg: #fbfbfa; --panel: #ffffff; --ink: #1c1d1f; --muted: #6b6f76; --line: #e6e6e3;
+    --accent: #2f6fde; --bar: #2f6fde; --bar-soft: #c9d8f5; --good: #1f8a4c; --warn: #b26b00; --chip: #f1f1ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121315; --panel: #1a1b1e; --ink: #e9e9e6; --muted: #9a9ea6; --line: #2b2d31;
+      --accent: #7aa7ff; --bar: #6f9cff; --bar-soft: #2c3a57; --good: #4cc48a; --warn: #e0a54a; --chip: #24262a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121315; --panel: #1a1b1e; --ink: #e9e9e6; --muted: #9a9ea6; --line: #2b2d31;
+    --accent: #7aa7ff; --bar: #6f9cff; --bar-soft: #2c3a57; --good: #4cc48a; --warn: #e0a54a; --chip: #24262a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 24px; max-width: 720px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input[type=number] { width: 100%; padding: 8px 10px; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+  .presets { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .presets button { font: inherit; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; }
+  .presets button:hover { border-color: var(--accent); }
+  .toggles { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; font-size: 14px; }
+  .toggles label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink); margin: 0; cursor: pointer; font-size: 14px; }
+  .helper { margin-top: 14px; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .helper input { width: 80px; padding: 4px 6px; }
+  .helper button { font: inherit; font-size: 13px; padding: 3px 10px; border-radius: 6px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.cost { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .barcell { width: 32%; }
+  .bar { height: 10px; border-radius: 5px; background: var(--bar); min-width: 2px; margin-top: 6px; }
+  .bar.soft { background: var(--bar-soft); }
+  .name a { color: var(--ink); text-decoration: none; font-weight: 600; }
+  .name a:hover { color: var(--accent); }
+  .how { font-size: 12px; color: var(--muted); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--chip); color: var(--muted); margin: 2px 4px 0 0; }
+  .tag.warn { color: var(--warn); }
+  .tag.good { color: var(--good); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .card p { margin: 4px 0; font-size: 13px; }
+  .card .k { color: var(--muted); }
+  .card a { color: var(--accent); font-size: 13px; word-break: break-all; }
+  .note { font-size: 13px; color: var(--muted); }
+  footer { margin-top: 32px; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--accent); }
+  @media (max-width: 640px) {
+    .barcell { display: none; }
+    td, th { padding: 8px 4px; }
+    h1 { font-size: 23px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>What will search cost your agent?</h1>
+  <p class="sub">Monthly cost of web search and page fetching for 8 APIs that agents use. Every price was read from the provider's own pricing page on <b id="checked"></b>, and each row links to it.</p>
+
+  <section class="panel" aria-label="Workload">
+    <div class="inputs">
+      <div>
+        <label for="searches">Searches per month</label>
+        <input id="searches" type="number" min="0" step="100" value="10000">
+        <div class="presets" data-for="searches"><button>1k</button><button>10k</button><button>100k</button><button>1M</button></div>
+      </div>
+      <div>
+        <label for="fetches">Pages fetched per month</label>
+        <input id="fetches" type="number" min="0" step="100" value="5000">
+        <div class="presets" data-for="fetches"><button>0</button><button>1k</button><button>10k</button><button>100k</button></div>
+      </div>
+      <div>
+        <label for="results">Results per search</label>
+        <input id="results" type="number" min="1" max="100" step="1" value="10">
+        <div class="note" style="margin-top:6px">Changes the price for Exa (&gt;10) and Firecrawl (per 10).</div>
+      </div>
+    </div>
+    <div class="toggles">
+      <label><input id="freeTier" type="checkbox" checked> Count monthly free credits</label>
+      <label><input id="advanced" type="checkbox"> Tavily advanced search</label>
+      <label><input id="promo" type="checkbox"> DeepSeek via Claude Code / Codex (free until 1 Nov 2026)</label>
+    </div>
+    <div class="helper">
+      Estimate from usage:
+      <input id="sessions" type="number" min="0" value="20" aria-label="agent sessions per day"> sessions/day ×
+      <input id="perSession" type="number" min="0" value="15" aria-label="searches per session"> searches/session × 30 days
+      <button id="apply">Use</button>
+    </div>
+  </section>
+
+  <h2>Monthly cost, cheapest first</h2>
+  <div class="panel" style="padding:6px 10px">
+    <table>
+      <thead><tr><th>Provider</th><th class="barcell"></th><th style="text-align:right">$/month</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="note">Search-only APIs are listed after the ones that can also fetch pages when you enter page fetches. Prices exclude tax. Plan and pack prices assume you pick the cheapest option that covers your volume.</p>
+
+  <h2>Pricing details, limits and data policy</h2>
+  <div class="cards" id="cards"></div>
+
+  <h2>Not in the calculator (yet)</h2>
+  <ul class="note" id="leftout"></ul>
+
+  <footer>
+    Open source: <a href="https://github.com/thinx-pro/agent-search-costs">github.com/thinx-pro/agent-search-costs</a>. A price changed? Open an issue or PR with the link to the provider's page. Not affiliated with any provider.
+  </footer>
+</main>
+<script type="module">
+  import { PROVIDERS, CHECKED, LEFT_OUT } from './prices.js';
+  import { rank } from './calc.js';
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n === null ? '—' : n === 0 ? '$0' : n < 100 ? `$${n.toFixed(2)}` : `$${Math.round(n).toLocaleString('en-US')}`;
+  const parseK = (s) => s === '1M' ? 1e6 : s.endsWith('k') ? Number(s.slice(0, -1)) * 1000 : Number(s);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  $('checked').textContent = CHECKED;
+
+  function read() {
+    const n = (id) => Math.max(0, Number($(id).value) || 0);
+    return { searches: n('searches'), fetches: n('fetches'), results: Math.max(1, n('results')), freeTier: $('freeTier').checked, advanced: $('advanced').checked, promo: $('promo').checked, now: new Date() };
+  }
+
+  function render() {
+    const w = read();
+    const rows = rank(PROVIDERS, w);
+    const max = Math.max(1, ...rows.filter((r) => r.usd != null).map((r) => r.usd));
+    const byId = Object.fromEntries(PROVIDERS.map((p) => [p.id, p]));
+    $('rows').innerHTML = rows.map((r) => {
+      const p = byId[r.id];
+      const tags = [];
+      if (r.searchOnly) tags.push('<span class="tag warn">search only</span>');
+      if (r.promoApplied) tags.push('<span class="tag good">promo</span>');
+      if (p.zdr === 'enterprise') tags.push('<span class="tag">ZDR: enterprise</span>');
+      for (const n of r.notes) if (!/no fetch|free via/.test(n)) tags.push(`<span class="tag">${esc(n)}</span>`);
+      const width = r.usd == null ? 0 : Math.max(0.5, (r.usd / max) * 100);
+      return `<tr>
+        <td class="name"><a href="${esc(p.source)}" target="_blank" rel="noopener">${esc(p.name)}</a><div class="how">${esc(r.label || '')}</div>${tags.join('')}</td>
+        <td class="barcell">${r.usd == null ? '<span class="how">not on a public plan</span>' : `<div class="bar ${r.searchOnly ? 'soft' : ''}" style="width:${width}%"></div>`}</td>
+        <td class="cost">${fmt(r.usd)}</td></tr>`;
+    }).join('');
+  }
+
+  $('cards').innerHTML = PROVIDERS.map((p) => `<div class="panel card">
+    <h3>${esc(p.name)}</h3>
+    <p>${esc(p.billing)}</p>
+    ${p.promo ? `<p><span class="k">Promo:</span> ${esc(p.promo.text)}</p>` : ''}
+    <p><span class="k">Limits:</span> ${esc(p.limits)}</p>
+    <p><span class="k">Data:</span> ${esc(p.retention)}</p>
+    <a href="${esc(p.source)}" target="_blank" rel="noopener">${esc(p.source)}</a>
+  </div>`).join('');
+  $('leftout').innerHTML = LEFT_OUT.map((x) => `<li><b>${esc(x.name)}</b>: ${esc(x.why)}</li>`).join('');
+
+  for (const box of document.querySelectorAll('.presets')) {
+    box.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON') return;
+      $(box.dataset.for).value = parseK(e.target.textContent);
+      render();
+    });
+  }
+  for (const id of ['searches', 'fetches', 'results', 'freeTier', 'advanced', 'promo']) $(id).addEventListener('input', render);
+  $('apply').addEventListener('click', () => {
+    $('searches').value = Math.round((Number($('sessions').value) || 0) * (Number($('perSession').value) || 0) * 30);
+    render();
+  });
+  render();
+</script>
+</body>
+</html>

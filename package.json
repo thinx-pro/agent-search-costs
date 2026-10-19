@@ -1,0 +1,11 @@
+{
+  "name": "agent-search-costs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "What will web search and page fetching cost your AI agent per month? Prices checked against each provider's own page.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "MIT"
+}
