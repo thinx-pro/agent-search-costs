@@ -57,13 +57,3 @@ Roadmap: a quality spot-check (same 50 queries through each API, results publish
 ## License
 
 MIT. Not affiliated with any of the providers listed.
-
----
-
-## 中文说明
-
-**agent-search-costs：给 Agent 用的搜索 / 抓取 API，每月到底要花多少钱？**
-
-DeepSeek 推出了 Search / Fetch 接口，每千次 0.75 美元，通过 Claude Code / Codex 调用在 2026 年 11 月 1 日前免费。但各家计费方式差别很大：按次、按 credit、按每 10 条结果、6 个月过期的预付包、带免费额度的月套餐。这个单页工具输入每月搜索次数和抓取页数，就能按你的用量算出 8 家（DeepSeek、Brave、Exa、Tavily、Serper、SerpApi、Perplexity、Firecrawl）的月费并排序。所有价格都在 2026-10-19 从各家官方价格页读取，每一行都附原始链接。只比较价格，不评估搜索质量。
-
-在线使用：https://thinx-pro.github.io/agent-search-costs/
